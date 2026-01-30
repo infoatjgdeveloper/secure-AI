@@ -14,7 +14,7 @@ Return the result strictly in the following JSON format:
 Do not include markdown formatting like \`\`\`json.
 `;
 
-async function callPerplexity(messages: any[]): Promise<string> {
+async function callPerplexity(messages: { role: string; content: string }[]): Promise<string> {
     const apiKey = process.env.PERPLEXITY_API_KEY;
     if (!apiKey) {
         throw new Error("PERPLEXITY_API_KEY is not set");
