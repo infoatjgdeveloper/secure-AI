@@ -68,6 +68,8 @@ export async function scanTextWithPerplexity(text: string): Promise<AnalysisResu
             { role: "user", content: prompt }
         ]);
 
+        console.log("Perplexity Raw Response (Text):", content);
+
         return parseResult(content);
     } catch (error) {
         console.error("Error scanning text with Perplexity:", error);
@@ -96,6 +98,8 @@ export async function scanCodeWithPerplexity(codeContent: string): Promise<Analy
             { role: "system", content: "You are an expert at detecting AI-generated code." },
             { role: "user", content: prompt }
         ]);
+
+        console.log("Perplexity Raw Response (Code):", content);
 
         return parseResult(content);
     } catch (error) {

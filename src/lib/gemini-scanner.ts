@@ -30,9 +30,12 @@ export async function scanPDF(buffer: Buffer): Promise<AnalysisResult> {
         const text = data.text;
 
         const prompt = `Expert AI Forensic Analysis: Is this text AI-generated? Analyze perplexity and burstiness. ${JSON_PROMPT_SUFFIX}\n\n${text}`;
+
+        console.log("Sending PDF text to Gemini...");
         const result = await model.generateContent(prompt);
         const response = result.response;
         const textResponse = response.text();
+        console.log("Gemini Raw Response (PDF):", textResponse);
 
         try {
             const jsonResponse = JSON.parse(textResponse.replace(/```json/g, '').replace(/```/g, '').trim());
@@ -70,6 +73,7 @@ export async function scanImage(buffer: Buffer, mimeType: string): Promise<Analy
         const result = await model.generateContent([prompt, imagePart]);
         const response = result.response;
         const textResponse = response.text();
+        console.log("Gemini Raw Response (Image):", textResponse);
 
         try {
             const jsonResponse = JSON.parse(textResponse.replace(/```json/g, '').replace(/```/g, '').trim());
@@ -113,6 +117,7 @@ export async function scanCode(codeContent: string): Promise<AnalysisResult> {
         const result = await model.generateContent(prompt);
         const response = result.response;
         const textResponse = response.text();
+        console.log("Gemini Raw Response (Code):", textResponse);
 
         try {
             const jsonResponse = JSON.parse(textResponse.replace(/```json/g, '').replace(/```/g, '').trim());
