@@ -4,6 +4,24 @@ import { scanTextWithPerplexity, scanCodeWithPerplexity } from "@/lib/perplexity
 
 const pdfParse = require("pdf-parse");
 
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60; // Set timeout to 60 seconds
+
+export async function GET() {
+    return NextResponse.json({ message: "Upload file via POST" }, { status: 405 });
+}
+
+export async function OPTIONS() {
+    return NextResponse.json({}, {
+        status: 200,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
+    });
+}
+
 export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData();
