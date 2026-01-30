@@ -9,7 +9,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "adTask.ai - Transform Your Digital Presence",
+  title: "JG AI  - Transform Your Digital Presence",
   description:
     "AI-powered marketing assistant that analyzes your business and creates personalized strategies",
 };
