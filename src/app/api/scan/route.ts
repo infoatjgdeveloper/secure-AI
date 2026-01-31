@@ -25,6 +25,8 @@ export async function OPTIONS() {
 
 export async function POST(request: NextRequest) {
     try {
+        console.log("request", request);
+
         const formData = await request.formData();
         const file = formData.get("file") as File;
 

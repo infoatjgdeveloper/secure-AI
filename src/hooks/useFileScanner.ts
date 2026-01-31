@@ -47,6 +47,7 @@ export const useFileScanner = () => {
             setStatus("scanning");
 
             if (!response.ok) {
+                console.error(response)
                 throw new Error(`Scan failed: ${response.statusText}`);
             }
 
