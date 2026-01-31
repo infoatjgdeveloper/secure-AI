@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-const pdfParse = require("pdf-parse");
 
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
@@ -26,7 +25,9 @@ Do not include markdown formatting like \`\`\`json.
 
 export async function scanPDF(buffer: Buffer): Promise<AnalysisResult> {
     try {
-        const data = await pdfParse(buffer);
+        const { PDFParse } = await import("pdf-parse");
+        const pdfParser = new PDFParse({ data: buffer });
+        const data = await pdfParser.getText();
         const text = data.text;
 
         const prompt = `Expert AI Forensic Analysis: Is this text AI-generated? Analyze perplexity and burstiness. ${JSON_PROMPT_SUFFIX}\n\n${text}`;

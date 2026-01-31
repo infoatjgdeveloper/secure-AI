@@ -61,8 +61,9 @@ export async function scanFileAction(formData: FormData): Promise<ScanResult> {
 
             if (mimeType === "application/pdf" || ext === "pdf") {
                 // Extract text from PDF for Perplexity
-                const pdfParse = (await import("pdf-parse")) as any;
-                const data = await pdfParse(buffer);
+                const { PDFParse } = await import("pdf-parse");
+                const pdfParser = new PDFParse({ data: buffer });
+                const data = await pdfParser.getText();
                 console.log("Falling back to Perplexity for PDF Text...");
                 result = await scanTextWithPerplexity(data.text);
             } else if (
