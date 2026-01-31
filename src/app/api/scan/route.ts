@@ -4,13 +4,7 @@ import { scanTextWithPerplexity, scanCodeWithPerplexity } from "@/lib/perplexity
 
 const pdfParse = require("pdf-parse");
 
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
-export const maxDuration = 60; // Set timeout to 60 seconds
 
-export async function OPTIONS() {
-    return new NextResponse(null, { status: 200 });
-}
 
 export async function POST(request: NextRequest) {
     try {
