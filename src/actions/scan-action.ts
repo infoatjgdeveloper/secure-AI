@@ -1,16 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
+"use server";
+
 import { scanPDF, scanImage, scanCode } from "@/lib/gemini-scanner";
 import { scanTextWithPerplexity, scanCodeWithPerplexity } from "@/lib/perplexity-scanner";
 
 const pdfParse = require("pdf-parse");
 
+export interface ScanResult {
+    score: number;
+    isHuman: boolean;
+    reasoning?: string;
+    verdict?: string;
+}
 
-
-export async function POST(request: NextRequest) {
+export async function scanFileAction(formData: FormData): Promise<ScanResult> {
     try {
-        console.log("request", request);
-
-        const formData = await request.formData();
         const file = formData.get("file") as File;
 
         console.log("------- NEW SCAN REQUEST -------");
@@ -19,7 +22,7 @@ export async function POST(request: NextRequest) {
         }
 
         if (!file) {
-            return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+            throw new Error("No file uploaded");
         }
 
         const buffer = Buffer.from(await file.arrayBuffer());
@@ -27,7 +30,7 @@ export async function POST(request: NextRequest) {
         const fileName = file.name;
         const ext = fileName.split('.').pop()?.toLowerCase();
 
-        let result;
+        let result: ScanResult;
 
         try {
             // Attempt with Gemini first
@@ -48,10 +51,7 @@ export async function POST(request: NextRequest) {
                 console.log("Detected Text/Code. Initiating Gemini Code Scan...");
                 result = await scanCode(textContent);
             } else {
-                return NextResponse.json(
-                    { error: `File type ${ext} not supported.` },
-                    { status: 400 }
-                );
+                throw new Error(`File type ${ext} not supported.`);
             }
         } catch (geminiError) {
             console.error("Gemini Scan Failed. Attempting fallback to Perplexity...", geminiError);
@@ -78,12 +78,9 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        return NextResponse.json(result);
+        return result;
     } catch (error: any) {
         console.error("Error processing file:", error);
-        return NextResponse.json(
-            { error: error.message || "Internal server error processing file" },
-            { status: 500 }
-        );
+        throw new Error(error.message || "Internal server error processing file");
     }
 }

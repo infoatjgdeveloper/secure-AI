@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import { scanFileAction } from "@/actions/scan-action";
 
 export type ScanStatus = "idle" | "uploading" | "scanning" | "result" | "error";
 
@@ -37,21 +38,12 @@ export const useFileScanner = () => {
             const formData = new FormData();
             formData.append("file", uploadedFile);
 
-            const response = await fetch("/api/scan", {
-                method: "POST",
-                body: formData,
-            });
+            // Call Server Action instead of API route
+            const data = await scanFileAction(formData);
 
             clearInterval(uploadInterval);
             setProgress(100);
             setStatus("scanning");
-
-            if (!response.ok) {
-                console.error(response)
-                throw new Error(`Scan failed: ${response.statusText}`);
-            }
-
-            const data = await response.json();
 
             // Artificial delay to show scanning animation
             setTimeout(() => {
