@@ -3,8 +3,6 @@
 import { scanPDF, scanImage, scanCode } from "@/lib/gemini-scanner";
 import { scanTextWithPerplexity, scanCodeWithPerplexity } from "@/lib/perplexity-scanner";
 
-const pdfParse = require("pdf-parse");
-
 export interface ScanResult {
     score: number;
     isHuman: boolean;
@@ -63,6 +61,7 @@ export async function scanFileAction(formData: FormData): Promise<ScanResult> {
 
             if (mimeType === "application/pdf" || ext === "pdf") {
                 // Extract text from PDF for Perplexity
+                const pdfParse = (await import("pdf-parse")) as any;
                 const data = await pdfParse(buffer);
                 console.log("Falling back to Perplexity for PDF Text...");
                 result = await scanTextWithPerplexity(data.text);
