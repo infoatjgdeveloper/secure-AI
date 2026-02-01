@@ -1,3 +1,4 @@
+export const runtime = "nodejs";
 "use server";
 
 import { scanPDF, scanImage, scanCode } from "@/lib/gemini-scanner";
