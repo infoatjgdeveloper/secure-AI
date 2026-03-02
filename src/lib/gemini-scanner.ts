@@ -25,27 +25,38 @@ Do not include markdown formatting like \`\`\`json.
 
 export async function scanPDF(buffer: Buffer): Promise<AnalysisResult> {
     try {
-        const { PDFParse } = await import("pdf-parse");
-        const pdfParser = new PDFParse({ data: buffer });
-        const data = await pdfParser.getText();
-        const text = data.text;
+        const PDFParser = (await import("pdf2json")).default;
+
+        const text = await new Promise<string>((resolve, reject) => {
+            const parser = new PDFParser();
+
+            parser.on("pdfParser_dataReady", (data: any) => {
+                const text = data.Pages.flatMap((page: any) =>
+                    page.Texts.map((t: any) =>
+                        decodeURIComponent(t.R.map((r: any) => r.T).join(""))
+                    )
+                ).join(" ");
+                resolve(text);
+            });
+
+            parser.on("pdfParser_dataError", (err: any) => {
+                reject(new Error(err.parserError));
+            });
+
+            parser.parseBuffer(buffer);
+        });
 
         const prompt = `Expert AI Forensic Analysis: Is this text AI-generated? Analyze perplexity and burstiness. ${JSON_PROMPT_SUFFIX}\n\n${text}`;
 
-        console.log("Sending PDF text to Gemini...");
         const result = await model.generateContent(prompt);
-        const response = result.response;
-        const textResponse = response.text();
-        console.log("Gemini Raw Response (PDF):", textResponse);
+        const textResponse = result.response.text();
 
         try {
-            const jsonResponse = JSON.parse(textResponse.replace(/```json/g, '').replace(/```/g, '').trim());
-            return {
-                ...jsonResponse,
-                rawResponse: textResponse,
-            };
+            const jsonResponse = JSON.parse(
+                textResponse.replace(/```json/g, "").replace(/```/g, "").trim()
+            );
+            return { ...jsonResponse, rawResponse: textResponse };
         } catch (e) {
-            console.error("Failed to parse JSON response", e);
             return {
                 verdict: "Error",
                 reasoning: "Failed to parse AI response",
@@ -59,7 +70,6 @@ export async function scanPDF(buffer: Buffer): Promise<AnalysisResult> {
         throw new Error("Failed to scan PDF");
     }
 }
-
 export async function scanImage(buffer: Buffer, mimeType: string): Promise<AnalysisResult> {
     try {
         const prompt = `Expert AI Forensic Analysis: Is this image AI-generated? Check for anatomical errors (fingers/eyes), lighting inconsistencies, and 'plastic' textures. ${JSON_PROMPT_SUFFIX}`;

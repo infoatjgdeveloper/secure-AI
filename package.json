@@ -21,6 +21,8 @@
     "motion": "^12.4.3",
     "next": "15.1.11",
     "pdf-parse": "^2.4.5",
+    "pdf2json": "^4.0.2",
+    "pdfjs-dist": "^5.5.207",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.8",
